@@ -21,7 +21,7 @@
     "crypto"
   ],
   "author": "Jonathan Gros-Dubois",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Leasehold/ldpos-chain-crypto/issues"
   },
