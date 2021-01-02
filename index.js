@@ -43,9 +43,24 @@ class LDPoSChainCrypto {
   }
 
   prepareTransaction(transactionData) {
-    // Since the LDPoS transaction properties match the DEX transactionData
-    // properties exactly, no special pre-processing is required in this case.
-    let transaction = this.ldposClient.prepareMultisigTransaction(transactionData);
+    let {
+      recipientAddress,
+      amount,
+      fee,
+      timestamp,
+      message
+    } = transactionData;
+
+    let unsignedTransaction = {
+      type: 'transfer',
+      recipientAddress,
+      amount,
+      fee,
+      timestamp,
+      message
+    };
+
+    let transaction = this.ldposClient.prepareMultisigTransaction(unsignedTransaction);
     let signature = this.ldposClient.signMultisigTransaction(transaction);
 
     return {
