@@ -25,6 +25,36 @@ describe('DEX (ChainCrypto) API tests', async () => {
     await chainCrypto.unload();
   });
 
+  describe('prepareTransaction', async () => {
+
+    it('should prepare and sign transaction and return transaction and signature objects with all required properties', async () => {
+      let { transaction, signature } = chainCrypto.prepareTransaction({
+        recipientAddress: '1072f65df680b2767f55a6bcd505b68d90d227d6d8b2d340fe97aaa016ab6dd7ldpos',
+        amount: '10000000000',
+        fee: '10000000',
+        timestamp: 1609544665570,
+        message: ''
+      });
+
+      assert.notEqual(transaction, null);
+      assert.equal(typeof transaction.id, 'string');
+
+      // The signatures property should be an empty array.
+      // The DEX module will use the signatures array to store signature packets
+      // from the current DEX node and also other DEX nodes.
+      assert.equal(Array.isArray(transaction.signatures), true);
+      assert.equal(transaction.signatures.length, 0);
+
+      // The signature should be an object with a signerAddress property which holds
+      // the wallet address of the signer.
+      // Apart from that, the schema of the signature object is flexible; whatever
+      // is supported by the verifyTransactionSignature method.
+      assert.notEqual(signature, null);
+      assert.equal(typeof signature.signerAddress, 'string');
+    });
+
+  });
+
   describe('verifyTransactionSignature', async () => {
 
     beforeEach(async () => {
@@ -68,36 +98,6 @@ describe('DEX (ChainCrypto) API tests', async () => {
       }
       assert.notEqual(caughtError, null);
       assert.equal(caughtError.message, 'Network failure');
-    });
-
-  });
-
-  describe('prepareTransaction', async () => {
-
-    it('should prepare and sign transaction and return transaction and signature objects with all required properties', async () => {
-      let { transaction, signature } = chainCrypto.prepareTransaction({
-        recipientAddress: '1072f65df680b2767f55a6bcd505b68d90d227d6d8b2d340fe97aaa016ab6dd7ldpos',
-        amount: '10000000000',
-        fee: '10000000',
-        timestamp: 1609544665570,
-        message: ''
-      });
-
-      assert.notEqual(transaction, null);
-      assert.equal(typeof transaction.id, 'string');
-
-      // The signatures property should be an empty array.
-      // The DEX module will use the signatures array to store signature packets
-      // from the current DEX node and also other DEX nodes.
-      assert.equal(Array.isArray(transaction.signatures), true);
-      assert.equal(transaction.signatures.length, 0);
-
-      // The signature should be an object with a signerAddress property which holds
-      // the wallet address of the signer.
-      // Apart from that, the schema of the signature object is flexible; whatever
-      // is supported by the verifyTransactionSignature method.
-      assert.notEqual(signature, null);
-      assert.equal(typeof signature.signerAddress, 'string');
     });
 
   });
