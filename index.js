@@ -5,11 +5,11 @@ class LDPoSChainCrypto {
     this.chainSymbol = chainSymbol;
     this.chainModuleAlias = chainOptions.moduleAlias;
     this.passphrase = chainOptions.passphrase;
+    this.memberAddress = chainOptions.memberAddress;
   }
 
   async load(channel) {
     this.ldposClient = new LDPoSClient({
-      passphrase: this.passphrase,
       adapter: {
         getNetworkSymbol: async () => {
           return this.chainSymbol;
@@ -19,7 +19,10 @@ class LDPoSChainCrypto {
         }
       }
     });
-    return this.ldposClient.connect();
+    return this.ldposClient.connect({
+      passphrase: this.passphrase,
+      walletAddress: this.memberAddress
+    });
   }
 
   async unload() {
