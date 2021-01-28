@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/Leasehold/ldpos-chain-crypto#readme",
   "dependencies": {
-    "ldpos-client": "^2.5.0"
+    "ldpos-client": "^2.5.1"
   },
   "devDependencies": {
     "mocha": "^8.2.1"

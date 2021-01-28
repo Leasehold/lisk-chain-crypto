@@ -5,6 +5,7 @@ class LDPoSChainCrypto {
     this.chainSymbol = chainSymbol;
     this.chainModuleAlias = chainOptions.moduleAlias;
     this.passphrase = chainOptions.passphrase;
+    this.multisigAddress = chainOptions.walletAddress;
     this.memberAddress = chainOptions.memberAddress;
   }
 
@@ -56,6 +57,7 @@ class LDPoSChainCrypto {
 
     let unsignedTransaction = {
       type: 'transfer',
+      senderAddress: this.multisigAddress,
       recipientAddress,
       amount,
       fee,
