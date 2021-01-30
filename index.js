@@ -1,4 +1,4 @@
-const { LDPoSClient } = require('ldpos-client');
+const { createClient } = require('ldpos-client');
 
 class LDPoSChainCrypto {
   constructor({chainSymbol, chainOptions}) {
@@ -10,7 +10,7 @@ class LDPoSChainCrypto {
   }
 
   async load(channel) {
-    this.ldposClient = new LDPoSClient({
+    this.ldposClient = createClient({
       adapter: {
         getNetworkSymbol: async () => {
           return this.chainSymbol;
@@ -46,7 +46,7 @@ class LDPoSChainCrypto {
     return this.ldposClient.verifyMultisigTransactionSignature(transaction, signaturePacket);
   }
 
-  prepareTransaction(transactionData) {
+  async prepareTransaction(transactionData) {
     let {
       recipientAddress,
       amount,
@@ -66,7 +66,7 @@ class LDPoSChainCrypto {
     };
 
     let transaction = this.ldposClient.prepareMultisigTransaction(unsignedTransaction);
-    let signature = this.ldposClient.signMultisigTransaction(transaction);
+    let signature = await this.ldposClient.signMultisigTransaction(transaction);
 
     return {
       transaction,

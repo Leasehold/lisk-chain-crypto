@@ -28,7 +28,7 @@ describe('DEX (ChainCrypto) API tests', async () => {
   describe('prepareTransaction', async () => {
 
     it('should prepare and sign transaction and return transaction and signature objects with all required properties', async () => {
-      let { transaction, signature } = chainCrypto.prepareTransaction({
+      let { transaction, signature } = await chainCrypto.prepareTransaction({
         recipientAddress: '1072f65df680b2767f55a6bcd505b68d90d227d6d8b2d340fe97aaa016ab6dd7ldpos',
         amount: '10000000000',
         fee: '10000000',
@@ -58,7 +58,7 @@ describe('DEX (ChainCrypto) API tests', async () => {
   describe('verifyTransactionSignature', async () => {
 
     beforeEach(async () => {
-      let { transaction, signature } = chainCrypto.prepareTransaction({
+      let { transaction, signature } = await chainCrypto.prepareTransaction({
         recipientAddress: '1072f65df680b2767f55a6bcd505b68d90d227d6d8b2d340fe97aaa016ab6dd7ldpos',
         amount: '10000000000',
         fee: '10000000',
