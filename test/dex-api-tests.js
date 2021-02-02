@@ -29,7 +29,7 @@ describe('DEX (ChainCrypto) API tests', async () => {
 
     it('should prepare and sign transaction and return transaction and signature objects with all required properties', async () => {
       let { transaction, signature } = await chainCrypto.prepareTransaction({
-        recipientAddress: '1072f65df680b2767f55a6bcd505b68d90d227d6d8b2d340fe97aaa016ab6dd7ldpos',
+        recipientAddress: 'ldposd41fc93c5627f105a818aa86d2650850af7644b0',
         amount: '10000000000',
         fee: '10000000',
         timestamp: 1609544665570,
@@ -59,7 +59,7 @@ describe('DEX (ChainCrypto) API tests', async () => {
 
     beforeEach(async () => {
       let { transaction, signature } = await chainCrypto.prepareTransaction({
-        recipientAddress: '1072f65df680b2767f55a6bcd505b68d90d227d6d8b2d340fe97aaa016ab6dd7ldpos',
+        recipientAddress: 'ldposd41fc93c5627f105a818aa86d2650850af7644b0',
         amount: '10000000000',
         fee: '10000000',
         timestamp: 1609544665570,
@@ -69,7 +69,7 @@ describe('DEX (ChainCrypto) API tests', async () => {
       signaturePacket = signature;
     });
 
-    it('should return true if the signature belongs to the correct account and is valid', async () => {
+    it.only('should return true if the signature belongs to the correct account and is valid', async () => {
       let isValid = await chainCrypto.verifyTransactionSignature(preparedTxn, signaturePacket);
       assert.equal(isValid, true);
     });

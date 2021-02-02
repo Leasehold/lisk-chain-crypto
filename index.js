@@ -18,6 +18,13 @@ class LDPoSChainCrypto {
         getAccount: async (walletAddress) => {
           return channel.invoke(`${this.chainModuleAlias}:getAccount`, { walletAddress });
         }
+      },
+      store: {
+        saveItem: async (key, value) => {},
+        loadItem: async (key) => {
+          return '0';
+        },
+        deleteItem: async (key) => {},
       }
     });
     return this.ldposClient.connect({
