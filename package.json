@@ -1,6 +1,6 @@
 {
   "name": "ldpos-chain-crypto",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "LDEX ChainCrypto plugin",
   "main": "index.js",
   "directories": {
@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/Leasehold/ldpos-chain-crypto#readme",
   "dependencies": {
-    "ldpos-client": "^4.0.0"
+    "ldpos-client": "^4.0.3"
   },
   "devDependencies": {
     "mocha": "^8.2.1"
