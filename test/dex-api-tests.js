@@ -69,7 +69,7 @@ describe('DEX (ChainCrypto) API tests', async () => {
       signaturePacket = signature;
     });
 
-    it.only('should return true if the signature belongs to the correct account and is valid', async () => {
+    it('should return true if the signature belongs to the correct account and is valid', async () => {
       let isValid = await chainCrypto.verifyTransactionSignature(preparedTxn, signaturePacket);
       assert.equal(isValid, true);
     });

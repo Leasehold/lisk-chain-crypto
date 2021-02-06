@@ -11,6 +11,7 @@ class LDPoSChainCrypto {
 
   async load(channel) {
     this.ldposClient = createClient({
+      networkSymbol: this.chainSymbol,
       adapter: {
         getNetworkSymbol: async () => {
           return this.chainSymbol;
