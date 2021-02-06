@@ -1,6 +1,6 @@
 {
   "name": "ldpos-chain-crypto",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "LDEX ChainCrypto plugin",
   "main": "index.js",
   "directories": {
