@@ -2,18 +2,29 @@ const assert = require('assert');
 const LDPoSChainCrypto = require('../index');
 const Channel = require('./utils/channel');
 
+
 describe('DEX (ChainCrypto) API tests', async () => {
   let options;
   let chainCrypto;
   let channel;
   let preparedTxn;
   let signaturePacket;
+  let store;
 
   beforeEach(async () => {
+    store = {};
     options = {
       chainSymbol: 'ldpos',
       chainOptions: {
         passphrase: 'clerk aware give dog reopen peasant duty cheese tobacco trouble gold angle'
+      },
+      store: {
+        saveItem: async (key, value) => {
+          store[key] = value;
+        },
+        loadItem: async (key) => {
+          return store[key];
+        }
       }
     };
     channel = new Channel();

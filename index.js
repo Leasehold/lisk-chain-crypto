@@ -1,12 +1,19 @@
 const { createClient } = require('ldpos-client');
 
+const {
+  LDEX_LDPOS_MULTISIG_KEY_INDEX
+} = process.env;
+
 class LDPoSChainCrypto {
-  constructor({chainSymbol, chainOptions}) {
+  constructor({chainSymbol, chainOptions, store}) {
     this.chainSymbol = chainSymbol;
     this.chainModuleAlias = chainOptions.moduleAlias;
     this.passphrase = chainOptions.passphrase;
     this.multisigAddress = chainOptions.walletAddress;
     this.memberAddress = chainOptions.memberAddress;
+    if (store) {
+      this.store = store;
+    }
   }
 
   async load(channel) {
@@ -20,17 +27,12 @@ class LDPoSChainCrypto {
           return channel.invoke(`${this.chainModuleAlias}:getAccount`, { walletAddress });
         }
       },
-      store: {
-        saveItem: async (key, value) => {},
-        loadItem: async (key) => {
-          return '0';
-        },
-        deleteItem: async (key) => {},
-      }
+      store: this.store
     });
     return this.ldposClient.connect({
       passphrase: this.passphrase,
-      walletAddress: this.memberAddress
+      walletAddress: this.memberAddress,
+      multisigKeyIndex: LDEX_LDPOS_MULTISIG_KEY_INDEX == null ? null : Number(LDEX_LDPOS_MULTISIG_KEY_INDEX)
     });
   }
 
