@@ -8,14 +8,14 @@ const {
 } = process.env;
 
 class LDPoSChainCrypto {
-  constructor({chainSymbol, chainOptions, store}) {
+  constructor({ chainSymbol, chainOptions, store }) {
     this.chainSymbol = chainSymbol;
     this.chainModuleAlias = chainOptions.moduleAlias;
     this.passphrase = chainOptions.passphrase;
     this.multisigAddress = chainOptions.walletAddress;
     this.memberAddress = chainOptions.memberAddress;
-    this.storeDirPath = chainOptions.keyIndexDirPath;
-    if (this.storeDirPath == null) {
+    this.keyIndexDirPath = chainOptions.keyIndexDirPath;
+    if (this.keyIndexDirPath == null) {
       throw new Error(
         `A keyIndexDirPath must be specified as part of the ${
           this.chainSymbol
@@ -28,7 +28,7 @@ class LDPoSChainCrypto {
   }
 
   async load(channel) {
-    await mkdir(this.storeDirPath, {recursive: true});
+    await mkdir(this.keyIndexDirPath, { recursive: true });
 
     this.ldposClient = createClient({
       networkSymbol: this.chainSymbol,
@@ -41,13 +41,14 @@ class LDPoSChainCrypto {
         }
       },
       store: this.store,
-      storeDirPath: this.storeDirPath
+      storeDirPath: this.keyIndexDirPath
     });
-    return this.ldposClient.connect({
+    await this.ldposClient.connect({
       passphrase: this.passphrase,
       walletAddress: this.memberAddress,
       multisigKeyIndex: LDEX_LDPOS_MULTISIG_KEY_INDEX == null ? null : Number(LDEX_LDPOS_MULTISIG_KEY_INDEX)
     });
+    await this.ldposClient.syncKeyIndex('multisig');
   }
 
   async unload() {

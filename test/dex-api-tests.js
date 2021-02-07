@@ -16,7 +16,8 @@ describe('DEX (ChainCrypto) API tests', async () => {
     options = {
       chainSymbol: 'ldpos',
       chainOptions: {
-        passphrase: 'clerk aware give dog reopen peasant duty cheese tobacco trouble gold angle'
+        passphrase: 'clerk aware give dog reopen peasant duty cheese tobacco trouble gold angle',
+        keyIndexDirPath: './test/data/'
       },
       store: {
         saveItem: async (key, value) => {
