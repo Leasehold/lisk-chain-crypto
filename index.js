@@ -80,6 +80,12 @@ class LDPoSChainCrypto {
       message
     } = transactionData;
 
+    if (!this.ldposClient.validateWalletAddress(recipientAddress)) {
+      throw new Error(
+        'Failed to prepare the transaction because the recipientAddress was invalid'
+      );
+    }
+
     let unsignedTransaction = {
       type: 'transfer',
       senderAddress: this.multisigAddress,
