@@ -1,7 +1,7 @@
 {
-  "name": "ldpos-chain-crypto",
-  "version": "2.1.0",
-  "description": "LDEX ChainCrypto plugin",
+  "name": "lisk-chain-crypto",
+  "version": "1.0.0",
+  "description": "LDEX ChainCrypto plugin for Lisk and Leasehold",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -11,23 +11,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Leasehold/ldpos-chain-crypto.git"
+    "url": "git+https://github.com/Leasehold/lisk-chain-crypto.git"
   },
   "keywords": [
     "lisk",
     "dex",
     "leasehold",
-    "ldpos",
     "crypto"
   ],
   "author": "Jonathan Gros-Dubois",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Leasehold/ldpos-chain-crypto/issues"
+    "url": "https://github.com/Leasehold/lisk-chain-crypto/issues"
   },
-  "homepage": "https://github.com/Leasehold/ldpos-chain-crypto#readme",
+  "homepage": "https://github.com/Leasehold/lisk-chain-crypto#readme",
   "dependencies": {
-    "ldpos-client": "^5.1.0"
+    "@liskhq/lisk-cryptography": "2.3.0",
+    "@liskhq/lisk-transactions": "2.3.1"
   },
   "devDependencies": {
     "mocha": "^8.2.1"

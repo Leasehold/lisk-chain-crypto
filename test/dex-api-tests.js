@@ -1,12 +1,10 @@
 const assert = require('assert');
-const LDPoSChainCrypto = require('../index');
-const Channel = require('./utils/channel');
+const LiskChainCrypto = require('../index');
 
 
 describe('DEX (ChainCrypto) API tests', async () => {
   let options;
   let chainCrypto;
-  let channel;
   let preparedTxn;
   let signaturePacket;
   let store;
@@ -14,9 +12,9 @@ describe('DEX (ChainCrypto) API tests', async () => {
   beforeEach(async () => {
     store = {};
     options = {
-      chainSymbol: 'ldpos',
       chainOptions: {
-        passphrase: 'clerk aware give dog reopen peasant duty cheese tobacco trouble gold angle',
+        sharedPassphrase: 'original wolf grass seed excite current write castle lab brain hawk bless',
+        passphrase: 'tell sun crazy time creek carbon cloud various turtle leisure cactus melody',
         keyIndexDirPath: './test/data/'
       },
       store: {
@@ -28,9 +26,8 @@ describe('DEX (ChainCrypto) API tests', async () => {
         }
       }
     };
-    channel = new Channel();
-    chainCrypto = new LDPoSChainCrypto(options);
-    await chainCrypto.load(channel);
+    chainCrypto = new LiskChainCrypto(options);
+    await chainCrypto.load();
   });
 
   afterEach(async () => {
@@ -41,10 +38,10 @@ describe('DEX (ChainCrypto) API tests', async () => {
 
     it('should prepare and sign transaction and return transaction and signature objects with all required properties', async () => {
       let { transaction, signature } = await chainCrypto.prepareTransaction({
-        recipientAddress: 'ldposd41fc93c5627f105a818aa86d2650850af7644b0',
+        recipientAddress: '213818552997703753L',
         amount: '10000000000',
         fee: '10000000',
-        timestamp: 1609544665570,
+        timestamp: 1609544665,
         message: ''
       });
 
@@ -71,10 +68,10 @@ describe('DEX (ChainCrypto) API tests', async () => {
 
     beforeEach(async () => {
       let { transaction, signature } = await chainCrypto.prepareTransaction({
-        recipientAddress: 'ldposd41fc93c5627f105a818aa86d2650850af7644b0',
+        recipientAddress: '213818552997703753L',
         amount: '10000000000',
         fee: '10000000',
-        timestamp: 1609544665570,
+        timestamp: 1609544665,
         message: ''
       });
       preparedTxn = transaction;
@@ -93,23 +90,9 @@ describe('DEX (ChainCrypto) API tests', async () => {
     });
 
     it('should return false if the signature is valid but does not belong to the correct account', async () => {
-      signaturePacket.signerAddress = '1a85e6041a05d266914cbf3837da81e29b4a7e66b9f9f8804809e914f6018201ldpos';
+      signaturePacket.signerAddress = '213818552997703753L';
       let isValid = await chainCrypto.verifyTransactionSignature(preparedTxn, signaturePacket);
       assert.equal(isValid, false);
-    });
-
-    it('should throw an error if the operation fails for any unexpected reason', async () => {
-      chainCrypto.ldposClient.adapter.getAccount = async (walletAddress) => {
-        throw new Error('Network failure');
-      };
-      let caughtError;
-      try {
-        await chainCrypto.verifyTransactionSignature(preparedTxn, signaturePacket);
-      } catch (error) {
-        caughtError = error;
-      }
-      assert.notEqual(caughtError, null);
-      assert.equal(caughtError.message, 'Network failure');
     });
 
   });

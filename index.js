@@ -1,109 +1,69 @@
-const fs = require('fs');
-const util = require('util');
-const mkdir = util.promisify(fs.mkdir);
-const { createClient } = require('ldpos-client');
+const liskCryptography = require('@liskhq/lisk-cryptography');
+const liskTransactions = require('@liskhq/lisk-transactions');
 
-const {
-  LDEX_LDPOS_MULTISIG_KEY_INDEX
-} = process.env;
-
-class LDPoSChainCrypto {
-  constructor({ chainSymbol, chainOptions, store }) {
-    this.chainSymbol = chainSymbol;
-    this.chainModuleAlias = chainOptions.moduleAlias;
+class LiskChainCrypto {
+  constructor({chainOptions}) {
+    this.sharedPassphrase = chainOptions.sharedPassphrase;
     this.passphrase = chainOptions.passphrase;
-    this.multisigAddress = chainOptions.walletAddress;
-    this.memberAddress = chainOptions.memberAddress;
-    this.keyIndexDirPath = chainOptions.keyIndexDirPath;
-    if (this.keyIndexDirPath == null) {
-      throw new Error(
-        `A keyIndexDirPath must be specified as part of the ${
-          this.chainSymbol
-        } chain config`
-      );
-    }
-    if (store) {
-      this.store = store;
-    }
   }
 
-  async load(channel) {
-    await mkdir(this.keyIndexDirPath, { recursive: true });
+  async load() {}
 
-    this.ldposClient = createClient({
-      networkSymbol: this.chainSymbol,
-      adapter: {
-        getNetworkSymbol: async () => {
-          return this.chainSymbol;
-        },
-        getAccount: async (walletAddress) => {
-          return channel.invoke(`${this.chainModuleAlias}:getAccount`, { walletAddress });
-        }
-      },
-      store: this.store,
-      storeDirPath: this.keyIndexDirPath
-    });
-    await this.ldposClient.connect({
-      passphrase: this.passphrase,
-      walletAddress: this.memberAddress,
-      multisigKeyIndex: LDEX_LDPOS_MULTISIG_KEY_INDEX == null ? null : Number(LDEX_LDPOS_MULTISIG_KEY_INDEX)
-    });
-    await this.ldposClient.syncKeyIndex('multisig');
-  }
-
-  async unload() {
-    this.ldposClient.disconnect();
-  }
+  async unload() {}
 
   // This method checks that:
   // 1. The signerAddress corresponds to the publicKey.
   // 2. The publicKey corresponds to the signature.
   async verifyTransactionSignature(transaction, signaturePacket) {
-    let { signerAddress, multisigPublicKey } = signaturePacket;
-    let account = await this.ldposClient.getAccount(signerAddress);
-    if (
-      multisigPublicKey !== account.multisigPublicKey &&
-      multisigPublicKey !== account.nextMultisigPublicKey
-    ) {
+    let { signature: signatureToVerify, publicKey, signerAddress } = signaturePacket;
+    let expectedAddress = liskCryptography.getAddressFromPublicKey(publicKey);
+    if (signerAddress !== expectedAddress) {
       return false;
     }
-
-    return this.ldposClient.verifyMultisigTransactionSignature(transaction, signaturePacket);
+    let { signature, signSignature, signatures, ...transactionToHash } = transaction;
+    let txnHash = liskCryptography.hash(liskTransactions.utils.getTransactionBytes(transactionToHash));
+    return liskCryptography.verifyData(txnHash, signatureToVerify, publicKey);
   }
 
   async prepareTransaction(transactionData) {
-    let {
-      recipientAddress,
-      amount,
-      fee,
-      timestamp,
-      message
-    } = transactionData;
-
-    if (!this.ldposClient.validateWalletAddress(recipientAddress)) {
+    try {
+      liskTransactions.utils.validateAddress(transactionData.recipientAddress);
+    } catch (error) {
       throw new Error(
         'Failed to prepare the transaction because the recipientAddress was invalid'
       );
     }
-
-    let unsignedTransaction = {
-      type: 'transfer',
-      senderAddress: this.multisigAddress,
-      recipientAddress,
-      amount,
-      fee,
-      timestamp,
-      message
+    let sharedPassphrase = this.sharedPassphrase;
+    let passphrase = this.passphrase;
+    let txn = {
+      type: 0,
+      amount: transactionData.amount.toString(),
+      recipientId: transactionData.recipientAddress,
+      fee: liskTransactions.constants.TRANSFER_FEE.toString(),
+      asset: {},
+      timestamp: transactionData.timestamp,
+      senderPublicKey: liskCryptography.getAddressAndPublicKeyFromPassphrase(sharedPassphrase).publicKey
     };
+    if (transactionData.message != null) {
+      txn.asset.data = transactionData.message;
+    }
+    let preparedTxn = liskTransactions.utils.prepareTransaction(txn, sharedPassphrase);
 
-    let transaction = this.ldposClient.prepareMultisigTransaction(unsignedTransaction);
-    let signature = await this.ldposClient.signMultisigTransaction(transaction);
+    let { signature, signSignature, signatures, ...transactionToHash } = preparedTxn;
+    let txnHash = liskCryptography.hash(liskTransactions.utils.getTransactionBytes(transactionToHash));
+    let { address: signerAddress, publicKey } = liskCryptography.getAddressAndPublicKeyFromPassphrase(passphrase);
 
-    return {
-      transaction,
-      signature
+    // The signature needs to be an object with a signerAddress property, the other
+    // properties are flexible and depend on the requirements of the underlying blockchain.
+    let multisigTxnSignature = {
+      signerAddress,
+      publicKey,
+      signature: liskCryptography.signData(txnHash, passphrase)
     };
+    preparedTxn.signatures = [];
+
+    return {transaction: preparedTxn, signature: multisigTxnSignature};
   }
 }
 
-module.exports = LDPoSChainCrypto;
+module.exports = LiskChainCrypto;
