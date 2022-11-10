@@ -1,2 +1,2 @@
 # lisk-chain-crypto
-Capitalisk DEX ChainCrypto plugin for LDPoS
+Capitalisk DEX ChainCrypto plugin for Lisk
